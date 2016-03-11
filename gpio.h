@@ -28,5 +28,6 @@ int rpi_gpio_read_status(int port);
 
 void rpi_gpio_fast_up(int port);
 void rpi_gpio_fast_down(int port);
+int rpi_gpio_fast_read(int port);
 
 #endif

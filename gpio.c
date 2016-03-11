@@ -180,3 +180,12 @@ inline void rpi_gpio_fast_down(int pin)
     int port = pinToGpio[pin];
     *(gpio_map + OFFSET_CLR + (port/32)) = 1 << (port%32);
 }
+
+// This function returns the digital state of a gpio line.
+// If returns value is 0 the status is low, up otherwise.
+// Use with caution: no bounds check on pin number line
+inline int rpi_gpio_fast_read(int pin)
+{
+    int port = pinToGpio[pin];
+    return *(gpio_map + OFFSET_READ + (port/32)) & (1<< (port%32));
+}

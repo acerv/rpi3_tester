@@ -1,9 +1,11 @@
 CC = gcc
 CFLAGS = -lpthread
+INFILES = tester.c gpio.c strutils.c
+OUTFILE = tester
 
 all:
-	$(CC) tester.c gpio.c -o tester $(CFLAGS)
+	$(CC) $(INFILES) -o $(OUTFILE) $(CFLAGS)
 debug:
-	$(CC) tester.c gpio.c -o tester -g $(CFLAGS)
+	$(CC) $(INFILES) -o $(OUTFILE) $(CFLAGS) -g
 clean:
-	rm -f tester.o tester
+	rm -f tester
