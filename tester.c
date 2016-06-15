@@ -30,50 +30,53 @@ void* blink_led(void* args)
     int *params;
     int up_down_counter = 0;
     
-    if (args != NULL) {
-        params = (int*)args;
-        port = params[0];
-        time_ns = params[1];
-        tim.tv_sec = 0;
-        tim.tv_nsec = time_ns;
-
-        // set port direction to gitial output
-        rpi_gpio_set_output(port);
-
-        // this check has been removed from the while,
-        // to speed up port writing and do hardware speed tests
-        if (time_ns > 0 && time_ns < 1e4) { // use nanosleep
-            while (m_stop_blinking) {
-                rpi_gpio_fast_up(port);
-                if (nanosleep(&tim, NULL) < 0) {
-                    printf("Nano sleep system call failed\n");
-                    break;
-                }
-                rpi_gpio_fast_down(port);
-                if (nanosleep(&tim, NULL) < 0) {
-                    printf("Nano sleep system call failed\n");
-                    break;
-                }
-            }
-        } else if (time_ns > 1e4 && time_ns < 1e10) { // use usleep 
-            time_us = time_ns/1e3;
-            while(m_stop_blinking) {
-                rpi_gpio_fast_up(port);
-                usleep(time_us);
-                rpi_gpio_fast_down(port);
-                usleep(time_us);
-            }
-        } else {
-            while (!m_stop_blinking) {
-                rpi_gpio_fast_up(port);
-                rpi_gpio_fast_down(port);
-            }
-        }
-    } else {
+    if (args == NULL) {
         printf("ERROR: Arguments passed to pthread are empty!\n");
+        goto ret_statement;
     }
 
+    params = (int*)args;
+    port = params[0];
+    time_ns = params[1];
+    tim.tv_sec = 0;
+    tim.tv_nsec = time_ns;
+
+    // set port direction to gitial output
+    rpi_gpio_set_output(port);
+
+    // this check has been removed from the while,
+    // to speed up port writing and do hardware speed tests
+    if (time_ns > 0 && time_ns < 1e4) { // use nanosleep
+        while (m_stop_blinking) {
+            rpi_gpio_fast_up(port);
+            if (nanosleep(&tim, NULL) < 0) {
+                printf("Nano sleep system call failed\n");
+                break;
+            }
+            rpi_gpio_fast_down(port);
+            if (nanosleep(&tim, NULL) < 0) {
+                printf("Nano sleep system call failed\n");
+                break;
+            }
+        }
+    } else if (time_ns > 1e4 && time_ns < 1e10) { // use usleep 
+        time_us = time_ns/1e3;
+        while(m_stop_blinking) {
+            rpi_gpio_fast_up(port);
+            usleep(time_us);
+            rpi_gpio_fast_down(port);
+            usleep(time_us);
+        }
+    } else {
+        while (!m_stop_blinking) {
+            rpi_gpio_fast_up(port);
+            rpi_gpio_fast_down(port);
+        }
+    }
+
+ret_statement:
     //printf("Thread completed\n");
+    return NULL;
 }
 
 /************************************
@@ -107,60 +110,89 @@ void* frequency_read(void* args)
     int last_status = 0;
     int curr_status = 0;
 
-    if (args != NULL) { // nothing to do
-        port = ((int*)args)[0];
-        m_freq_counter = 0;
-       
-        // select the port direction to input
-        rpi_gpio_set_input(port);
-
-        // start reading the square wave
-        last_status = rpi_gpio_fast_read(port);
-        while (m_stop_freq_read) {
-            curr_status = rpi_gpio_fast_read(port);
-            if (last_status != curr_status) {
-                m_freq_counter++;
-            }
-            last_status = curr_status;
-        }
-    } else {
+    if (args == NULL) { // nothing to do
         printf("ERROR: Argument passed to frequency read thread is empty!\n");
+        goto ret_statement;
     }
+
+    port = ((int*)args)[0];
+    m_freq_counter = 0;
+   
+    // select the port direction to input
+    rpi_gpio_set_input(port);
+
+    // start reading the square wave
+    last_status = rpi_gpio_fast_read(port);
+    while (m_stop_freq_read) {
+        curr_status = rpi_gpio_fast_read(port);
+        if (last_status != curr_status) {
+            m_freq_counter++;
+        }
+        last_status = curr_status;
+    }
+
+ret_statement:
+    return NULL;
 }
 
-void execute_cmd(char* cmd) 
-{
-    int value = 0;
+/****************
+ * The commands
+ ****************/
+struct command {
+    char* label; // the command label
+    char* usage; // the usage label
+    void (*cmd)(int,char**); // the command function
+};
+
+void read_cmd(int num_of_token, char** token_array) {
     int port = 0;
-    int time_ns = 0;
-    int* thread_args = NULL;
-    char** token_array = NULL;
-    int num_of_token = 0;
+    int value = 0;
 
-    token_array = strsplit(cmd, ' ', &num_of_token);
-    if (num_of_token <= 0) { // empty command
-        goto cleanup;
-    }
-
-    // read the command
     if (num_of_token >= 2 && strcmp(token_array[0], "read") == 0) {
         port = atoi(token_array[1]);
         value = rpi_gpio_read_status(port);
         printf("Pin%d: %d\n", port, value);
-    } else if (num_of_token >= 3 && strcmp(token_array[0], "write") == 0) {
+    }
+}
+
+void write_cmd(int num_of_token, char** token_array) {
+    int port = 0;
+    int value = 0;
+
+    if (num_of_token >= 3 && strcmp(token_array[0], "write") == 0) {
         port = atoi(token_array[1]);
         value = atoi(token_array[2]);
         rpi_gpio_write_status(port, value);
         printf("Pin%d: written %d\n", port, value);
-    } else if (num_of_token >= 2 && strcmp(token_array[0], "input") == 0) {
+    }
+}
+
+void input_cmd(int num_of_token, char** token_array) {
+    int port = 0;
+
+    if (num_of_token >= 2 && strcmp(token_array[0], "input") == 0) {
         port = atoi(token_array[1]);
         rpi_gpio_set_input(port);
         printf("Pin%d set as input\n", port);
-    } else if (num_of_token >= 2 && strcmp(token_array[0], "output") == 0) {
+    }
+}
+
+void output_cmd(int num_of_token, char** token_array) {
+    int port = 0;
+
+    if (num_of_token >= 2 && strcmp(token_array[0], "output") == 0) {
         port = atoi(token_array[1]);
         rpi_gpio_set_output(port);
         printf("Pin%d set as output\n", port);
-    } else if (num_of_token >= 2 && strcmp(token_array[0], "blink") == 0) {
+    }
+}
+
+void blink_cmd(int num_of_token, char** token_array) {
+    int port = 0;
+    int time_ns = 0;
+    int* thread_args = NULL;
+
+     if (num_of_token >= 2 && strcmp(token_array[0], "blink") == 0) {
         if (num_of_token >= 4 && strcmp(token_array[1], "start") == 0) {
             if (m_blink_thread != 0) {
                 printf ("Blinking already running\n");
@@ -176,8 +208,8 @@ void execute_cmd(char* cmd)
             thread_args[1] = time_ns;
 
             if (pthread_create(&m_blink_thread, NULL, blink_led, (void*)thread_args)) {
-               free(thread_args);
                printf("Error creating blink led thread!\n");
+               goto cleanup;
             } else {
                printf("Pin%d: blinking started with %dns\n", port, time_ns);
             }
@@ -191,6 +223,7 @@ void execute_cmd(char* cmd)
 
             if (pthread_join(m_blink_thread, NULL)) {
                 printf("Error joining the blink thread!\n");
+                goto cleanup;
             } else {
                 printf("Blinking stopped\n");
             }
@@ -199,7 +232,18 @@ void execute_cmd(char* cmd)
         } else {
             printf("Use \"blink [start|stop]\"\n");
         }
-    } else if (num_of_token >= 2 && strcmp(token_array[0], "freq") == 0) {
+    }
+    
+cleanup:
+    free(thread_args);
+    return;
+}
+
+void freq_cmd(int num_of_token, char** token_array) {
+    int port = 0;
+    int* thread_args = NULL;
+
+    if (num_of_token >= 2 && strcmp(token_array[0], "freq") == 0) {
         if (num_of_token >= 3 && strcmp(token_array[1], "start") == 0) {
             if (m_freq_read_thread != 0 || m_clock_read_thread != 0) {
                 printf("Frequency read already running\n");
@@ -212,12 +256,13 @@ void execute_cmd(char* cmd)
             thread_args[0] = port;
 
             if (pthread_create(&m_freq_read_thread, NULL, frequency_read, thread_args)) {
-                free(thread_args);
                 printf("Error creating frequency read thread!\n");
+                goto cleanup;
             } 
 
             if (pthread_create(&m_clock_read_thread, NULL, clock_read, NULL)) {
                 printf("Error creating clock read thread!\n");
+                goto cleanup;
             } else {
                 printf("Pin%d: frequency read started\n", port);
             }
@@ -231,10 +276,12 @@ void execute_cmd(char* cmd)
 
             if (pthread_join(m_freq_read_thread, NULL)) {
                 printf("Error joining the frequency read thread\n");
+                goto cleanup;
             }
 
             if (pthread_join(m_clock_read_thread, NULL)) {
                 printf("Error joining the clock read thread\n");
+                goto cleanup;
             } else {
                 printf("Frequency read stopped\n");
             }
@@ -254,6 +301,43 @@ void execute_cmd(char* cmd)
     }
 
 cleanup:
+    free(thread_args);
+    return;
+}
+
+static const int m_num_of_commands = 9;
+static const struct command m_commands_list[] = {
+    {"input",   "input \"pin\"",     input_cmd},
+    {"output",  "output \"pin\"",    output_cmd},
+    {"read",    "read \"pin\"",      read_cmd},
+    {"write",   "write \"pin\"",     write_cmd},
+    
+    {"blink",   "blink start \"pin\"",  blink_cmd},
+    {"blink",   "blink stop \"pin\"",   blink_cmd},
+
+    {"freq",    "freq start \"pin\"",   freq_cmd},
+    {"freq",    "freq stop",            freq_cmd},
+    {"freq",    "freq print",           freq_cmd}
+};
+
+void execute_cmd(char* cmd) 
+{
+    char** token_array = NULL;
+    int num_of_token = 0;
+
+    token_array = strsplit(cmd, ' ', &num_of_token);
+    if (num_of_token <= 0) { // empty command
+        goto cleanup;
+    }
+
+    for (int i = 0; i < m_num_of_commands; i++) {
+        if (strcmp(m_commands_list[i].label, token_array[0]) == 0) {
+            m_commands_list[i].cmd(num_of_token, token_array);
+            break;
+        }
+    }
+
+cleanup:
     strfree(&token_array, num_of_token);
     return;
 }
@@ -268,17 +352,12 @@ int main()
 	if ((return_error = rpi_gpio_setup()) != GPIO_NO_ERROR) {
 		return 1;
 	}
-    printf("\nUse one of the following commands:\n"
-           "- output \"pin\"\n"
-           "- input \"pin\"\n"
-           "- read \"pin\"\n"
-           "- write \"pin\" \"value\"\n"
-           "- blink start \"pin\" \"time ns\"\n"
-           "- blink stop\n"
-           "- freq start \"pin\"\n"
-           "- freq stop\n"
-           "- freq print\n"
-           "- exit\n\n");
+
+    printf("\nUse one of the following commands:\n");
+    for (int i = 0; i < m_num_of_commands; i++) {
+        printf("- %s\n", m_commands_list[i].usage);
+    }
+    printf("- exit\n\n");
 
     while(1) {
         printf("cmd> ");

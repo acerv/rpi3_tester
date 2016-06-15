@@ -67,8 +67,8 @@ int rpi_gpio_setup(void)
 		return GPIO_SETUP_FAILED;
 	}
 
-	if ((uint32_t)gpio_mem % PAGE_SIZE) {
-		gpio_mem += PAGE_SIZE - ((uint32_t)gpio_mem % PAGE_SIZE);
+	if (*(uint32_t*)gpio_mem % PAGE_SIZE) {
+		gpio_mem += PAGE_SIZE - (*(uint32_t*)gpio_mem % PAGE_SIZE);
 	}
 
     gpio_dev = BCM2709_BASE_DEFAULT;
@@ -81,7 +81,7 @@ int rpi_gpio_setup(void)
 		mem_fd,
 		gpio_base);
 
-	if ((uint32_t)gpio_map < 0) {
+	if (*(uint32_t*)gpio_map < 0) {
 		printf("Gpio setup can't access to virtual GPIO memory.\n");
 		return GPIO_SETUP_FAILED;
 	}
