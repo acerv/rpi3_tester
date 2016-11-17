@@ -1,6 +1,6 @@
 /**
  * Copyright by Andrea Cervesato <sawk.ita@gmail.com>
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -25,11 +25,10 @@ void* blink_led(void* args)
 {
     struct timespec tim;
     long time_ns = 0;
-    int time_us = 0;
     int port = 0;
     int *params;
     int up_down_counter = 0;
-    
+
     if (args == NULL) {
         printf("ERROR: Arguments passed to pthread are empty!\n");
         goto ret_statement;
@@ -46,7 +45,7 @@ void* blink_led(void* args)
 
     // this check has been removed from the while,
     // to speed up port writing and do hardware speed tests
-    if (time_ns > 0 && time_ns < 1e4) { // use nanosleep
+    if (time_ns > 0 && time_ns < 1e10) { 
         while (m_stop_blinking) {
             rpi_gpio_fast_up(port);
             if (nanosleep(&tim, NULL) < 0) {
@@ -58,14 +57,6 @@ void* blink_led(void* args)
                 printf("Nano sleep system call failed\n");
                 break;
             }
-        }
-    } else if (time_ns > 1e4 && time_ns < 1e10) { // use usleep 
-        time_us = time_ns/1e3;
-        while(m_stop_blinking) {
-            rpi_gpio_fast_up(port);
-            usleep(time_us);
-            rpi_gpio_fast_down(port);
-            usleep(time_us);
         }
     } else {
         while (!m_stop_blinking) {
@@ -104,7 +95,7 @@ void* clock_read(void* args)
     }
 }
 
-void* frequency_read(void* args) 
+void* frequency_read(void* args)
 {
     int port = 0;
     int last_status = 0;
@@ -117,7 +108,7 @@ void* frequency_read(void* args)
 
     port = ((int*)args)[0];
     m_freq_counter = 0;
-   
+
     // select the port direction to input
     rpi_gpio_set_input(port);
 
@@ -233,7 +224,7 @@ void blink_cmd(int num_of_token, char** token_array) {
             printf("Use \"blink [start|stop]\"\n");
         }
     }
-    
+
 cleanup:
     free(thread_args);
     return;
@@ -258,7 +249,7 @@ void freq_cmd(int num_of_token, char** token_array) {
             if (pthread_create(&m_freq_read_thread, NULL, frequency_read, thread_args)) {
                 printf("Error creating frequency read thread!\n");
                 goto cleanup;
-            } 
+            }
 
             if (pthread_create(&m_clock_read_thread, NULL, clock_read, NULL)) {
                 printf("Error creating clock read thread!\n");
@@ -293,7 +284,7 @@ void freq_cmd(int num_of_token, char** token_array) {
                 printf("You need to call \"freq start\" before print\n");
                 goto cleanup;
             }
-            
+
             printf("Frequency is %luHz\n", m_current_frequency);
         } else {
             printf("Use \"freq [start|print|stop]\"\n");
@@ -311,7 +302,7 @@ static const struct command m_commands_list[] = {
     {"output",  "output \"pin\"",    output_cmd},
     {"read",    "read \"pin\"",      read_cmd},
     {"write",   "write \"pin\"",     write_cmd},
-    
+
     {"blink",   "blink start \"pin\"",  blink_cmd},
     {"blink",   "blink stop \"pin\"",   blink_cmd},
 
@@ -320,7 +311,7 @@ static const struct command m_commands_list[] = {
     {"freq",    "freq print",           freq_cmd}
 };
 
-void execute_cmd(char* cmd) 
+void execute_cmd(char* cmd)
 {
     char** token_array = NULL;
     int num_of_token = 0;
