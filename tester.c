@@ -221,7 +221,7 @@ void blink_cmd(int num_of_token, char** token_array) {
 
             m_blink_thread = 0;
         } else {
-            printf("Use \"blink [start|stop]\"\n");
+            printf("Use \"blink [start|stop] [time_ns]\"\n");
         }
     }
 
@@ -298,17 +298,17 @@ cleanup:
 
 static const int m_num_of_commands = 9;
 static const struct command m_commands_list[] = {
-    {"input",   "input \"pin\"",     input_cmd},
-    {"output",  "output \"pin\"",    output_cmd},
-    {"read",    "read \"pin\"",      read_cmd},
-    {"write",   "write \"pin\"",     write_cmd},
+    {"input",   "input  [gpio]",      input_cmd},
+    {"output",  "output [gpio]",      output_cmd},
+    {"read",    "read   [gpio]",      read_cmd},
+    {"write",   "write  [gpio]",      write_cmd},
 
-    {"blink",   "blink start \"pin\"",  blink_cmd},
-    {"blink",   "blink stop \"pin\"",   blink_cmd},
+    {"blink",   "blink start [gpio] [time_ns]",   blink_cmd},
+    {"blink",   "blink stop  [gpio]",             blink_cmd},
 
-    {"freq",    "freq start \"pin\"",   freq_cmd},
-    {"freq",    "freq stop",            freq_cmd},
-    {"freq",    "freq print",           freq_cmd}
+    {"freq",    "freq start [pin]",   freq_cmd},
+    {"freq",    "freq stop",          freq_cmd},
+    {"freq",    "freq print",         freq_cmd}
 };
 
 void execute_cmd(char* cmd)
