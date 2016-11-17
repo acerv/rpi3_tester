@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -lpthread -std=c99
+CFLAGS = -lpthread
 INFILES = tester.c gpio.c strutils.c
 OUTFILE = tester
 
