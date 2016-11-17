@@ -18,6 +18,18 @@ The program command-line looks like this:
     
     cmd> 
 
+## Compiling
+The program must be compiled for the Raspberry PI3 platform, which is ARM.
+
+If you are using a Debian based distribution (i.e. Ubuntu), install the tools for cross compiling:
+    $ sudo apt install build-essential g++-arm-linux-gnueabihf gcc-arm-linux-gnueabihf 
+
+To compile the program, run the following commands inside the project directory:
+    $ export CC=arm-linux-gnueabihf-gcc
+    $ make
+
+Then you need to copy `tester` binary output in the Raspberry PI3 device and run it.
+
 ## Single GPIO setup and measurement
 To read/write a sinlge GPIO, use the following procedures:
 * use the `input` command to setup the GPIO as input, then call the `read` command to read the GPIO status;

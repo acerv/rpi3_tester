@@ -1,4 +1,3 @@
-CC = gcc
 CFLAGS = -lpthread
 INFILES = tester.c gpio.c strutils.c
 OUTFILE = tester
