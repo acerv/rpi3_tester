@@ -26,8 +26,8 @@ Use the `output` command to setup the GPIO as output, then use the `write` comma
 # Frequency generator
 To generate a frequency out of a GPIO, 
 The `blink` command usage is the following:
-* blink start [pin] [time_ns]: it generates a square waveform out of the given GPIO, with the specified time (in nanoseconds) between rising edges;
-* blink stop: it stops the sqare waveform.
+* `blink start [pin] [time_ns]`: it generates a square waveform out of the given GPIO, with the specified time (in nanoseconds) between rising edges;
+* `blink stop`: it stops the sqare waveform.
 
 With these routines, it's possible to obtain a 15MHz signal (~60ns wave) maximum, but the result can be improved by reducing register operations on GPIO virtual memory map (ie. knowing before the GPIO we want to use).
 
@@ -36,8 +36,8 @@ With these routines, it's possible to obtain a 15MHz signal (~60ns wave) maximum
 # Frequency reader
 To read the frequency of a sqared waveform, use the `freq` command.
 The `freq` command usage is the following:
-* freq start [gpio]: it starts to read the frequency of the waveform into the specified GPIO pin
-* freq stop: it stops the frequency read
-* freq print: it prints the current frequency
+* `freq start [gpio]`: it starts to read the frequency of the waveform into the specified GPIO pin
+* `freq stop`: it stops the frequency read
+* `freq print`: it prints the current frequency
 
 With these routines, the program can measure signals up to 4MHz, but the result can be improved by reducing register operations on GPIO virtual memory map (ie. knowing before the GPIO we want to use).
