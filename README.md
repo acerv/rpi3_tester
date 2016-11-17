@@ -18,26 +18,26 @@ The program command-line looks like this:
     
     cmd> 
 
-# Single GPIO setup and measurement
-To read/write a sinlge GPIO, this must be set to work with input/output mode.
-Use the `input` command to setup the GPIO as input, then use the `read` command.
-Use the `output` command to setup the GPIO as output, then use the `write` command.
+## Single GPIO setup and measurement
+To read/write a sinlge GPIO, use the following procedures:
+* use the `input` command to setup the GPIO as input, then call the `read` command to read the GPIO status;
+* use the `output` command to setup the GPIO as output, then call the `write` command to write the GPIO status.
 
-# Frequency generator
-To generate a frequency out of a GPIO, 
-The `blink` command usage is the following:
+## Frequency generator
+To generate a frequency signal out of a GPIO, use the `blink` command.
+The `blink` command works as follows:
 * `blink start [pin] [time_ns]`: it generates a square waveform out of the given GPIO, with the specified time (in nanoseconds) between rising edges;
 * `blink stop`: it stops the sqare waveform.
 
-With these routines, it's possible to obtain a 15MHz signal (~60ns wave) maximum, but the result can be improved by reducing register operations on GPIO virtual memory map (ie. knowing before the GPIO we want to use).
+With these routines, it's possible to obtain a 15MHz signal (~60ns wave) maximum, but the result can be improved reducing register operations on GPIO virtual memory map (ie. knowing before the GPIO we want to use).
 
 `nanosleep` is used to generate the square wave, but the resolution depends on the operative system. I checked it out, obtaining max 150us resolution between rising edges, when using the smallest sleep time (1ns).
 
-# Frequency reader
+## Frequency reader
 To read the frequency of a sqared waveform, use the `freq` command.
-The `freq` command usage is the following:
+The `freq` command works as follows:
 * `freq start [gpio]`: it starts to read the frequency of the waveform into the specified GPIO pin
 * `freq stop`: it stops the frequency read
 * `freq print`: it prints the current frequency
 
-With these routines, the program can measure signals up to 4MHz, but the result can be improved by reducing register operations on GPIO virtual memory map (ie. knowing before the GPIO we want to use).
+With these routines, the program can measure signals up to 4MHz, but the result can be improved reducing register operations on GPIO virtual memory map (ie. knowing before the GPIO we want to use).
