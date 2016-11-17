@@ -22,9 +22,11 @@ The program command-line looks like this:
 The program must be compiled for the Raspberry PI3 platform, which is ARM.
 
 If you are using a Debian based distribution (i.e. Ubuntu), install the tools for cross compiling:
+
     $ sudo apt install build-essential g++-arm-linux-gnueabihf gcc-arm-linux-gnueabihf 
 
 To compile the program, run the following commands inside the project directory:
+
     $ export CC=arm-linux-gnueabihf-gcc
     $ make
 
