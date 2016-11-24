@@ -1,6 +1,6 @@
 CFLAGS = -lpthread
 INFILES = tester.c gpio.c strutils.c
-OUTFILE = tester
+OUTFILE = rpi3tester
 
 all:
 	$(CC) $(INFILES) -o $(OUTFILE) $(CFLAGS)
