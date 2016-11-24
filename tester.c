@@ -15,6 +15,9 @@
 #include "gpio.h"
 #include "strutils.h"
 
+#define PROGNAME "rpi3tester"
+#define VERSION  "1.0"
+
 /********************************
  * BLINK COMMAND implementation
  ********************************/
@@ -334,13 +337,19 @@ cleanup:
     return;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     int input = 0;
     char line[1024];
     char* token = NULL;
     int return_error = 0;
     int i = 0;
+
+    // this command is used to check if program runs
+    if (argc > 1 && strcmp(argv[1], "-v") == 0) {
+        printf(PROGNAME" v"VERSION"\n");
+        return 0;
+    }
 
 	if ((return_error = rpi_gpio_setup()) != GPIO_NO_ERROR) {
 		return 1;
