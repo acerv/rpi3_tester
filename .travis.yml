@@ -6,6 +6,7 @@ addons:
     - build-essential
     - g++-arm-linux-gnueabihf
     - gcc-arm-linux-gnueabihf
+    - qemu
 
 compiler:
   - arm-linux-gnueabihf-gcc
@@ -14,3 +15,4 @@ script:
   - make clean
   - make
   - make debug
+  - sudo qemu-arm -L /usr/arm-linux-gnueabihf/ rpi3tester -v
