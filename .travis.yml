@@ -1,0 +1,16 @@
+language: C
+
+addons:
+  apt:
+    packages:
+    - build-essential
+    - g++-arm-linux-gnueabihf
+    - gcc-arm-linux-gnueabihf
+
+compiler:
+  - arm-linux-gnueabihf-gcc
+
+script: 
+  - make clean
+  - make
+  - make debug
