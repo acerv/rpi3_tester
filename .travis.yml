@@ -1,12 +1,15 @@
 language: C
+sudo: required
+dist: trusty
 
 addons:
   apt:
     packages:
-    - build-essential
+    - make
     - g++-arm-linux-gnueabihf
     - gcc-arm-linux-gnueabihf
     - qemu
+    - qemu-system-arm
 
 compiler:
   - arm-linux-gnueabihf-gcc
