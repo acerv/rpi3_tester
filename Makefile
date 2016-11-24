@@ -7,4 +7,4 @@ all:
 debug:
 	$(CC) $(INFILES) -o $(OUTFILE) $(CFLAGS) -g
 clean:
-	rm -f tester
+	rm -f $(INFILES)
