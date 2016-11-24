@@ -315,13 +315,14 @@ void execute_cmd(char* cmd)
 {
     char** token_array = NULL;
     int num_of_token = 0;
+    int i = 0;
 
     token_array = strsplit(cmd, ' ', &num_of_token);
     if (num_of_token <= 0) { // empty command
         goto cleanup;
     }
 
-    for (int i = 0; i < m_num_of_commands; i++) {
+    for (i = 0; i < m_num_of_commands; i++) {
         if (strcmp(m_commands_list[i].label, token_array[0]) == 0) {
             m_commands_list[i].cmd(num_of_token, token_array);
             break;
@@ -339,13 +340,14 @@ int main()
     char line[1024];
     char* token = NULL;
     int return_error = 0;
+    int i = 0;
 
 	if ((return_error = rpi_gpio_setup()) != GPIO_NO_ERROR) {
 		return 1;
 	}
 
     printf("\nUse one of the following commands:\n");
-    for (int i = 0; i < m_num_of_commands; i++) {
+    for (i = 0; i < m_num_of_commands; i++) {
         printf("- %s\n", m_commands_list[i].usage);
     }
     printf("- exit\n\n");
