@@ -33,7 +33,10 @@ To compile the program, run the following commands inside the project directory:
     $ export CC=arm-linux-gnueabihf-gcc
     $ make
 
-Then you need to copy `tester` binary output in the Raspberry PI3 device and run it.
+Then you need to copy `rpi3tester` binary output in the Raspberry PI3 device and run it:
+
+    $ scp ./rpi3tester pi@<raspberrypi IP>:/home/pi
+    $ ssh pi@<raspberrypi IP> /home/pi/rpi3tester
 
 ## Single GPIO setup and measurement
 To read/write a sinlge GPIO, use the following procedures:
