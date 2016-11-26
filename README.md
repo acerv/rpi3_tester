@@ -1,6 +1,6 @@
 # Introduction
 
-[![Build Status](https://travis-ci.org/acerv/rpi3_tester.svg?branch=master)](https://travis-ci.org/acerv/rpi3_tester)
+[![Build Status](https://travis-ci.org/acerv/rpi3tester.svg?branch=master)](https://travis-ci.org/acerv/rpi3tester)
 
 This is a simple test program for the Raspberry Pi 3, that can be use to measure the efficency of the GPIOs.
 It can also be used to read input frequency of a waveform and the generate frequency signals.
