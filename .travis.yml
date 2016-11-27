@@ -15,7 +15,7 @@ compiler:
   - arm-linux-gnueabihf-gcc
 
 script: 
-  - make clean
   - make
   - make debug
   - sudo qemu-arm -L /usr/arm-linux-gnueabihf/ rpi3tester -v
+  - make clean
